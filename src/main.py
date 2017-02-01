@@ -161,25 +161,23 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     test_all_images = np.reshape(test_all_images_2D, (784, 10000))
 
     # Choose some number of random columns from the train_images_2D
-    training_set_size = arg_training_set_size
-    print '%d random images from the training set is chosen. ' % training_set_size
-    training_set_indices = np.random.randint(0, train_all_images.shape[1], training_set_size)
-    training_set_images = train_all_images[:, training_set_indices]
-    training_set_labels = train_all_labels[:, training_set_indices]
+    num_eigen_vectors = arg_num_eigen_vectors
+    print '%d random images from the training set is chosen to construct the eigen space. ' % num_eigen_vectors
+    eigen_space_training_set_indices = np.random.randint(0, train_all_images.shape[1], num_eigen_vectors)
+    eigen_space_training_set_images = train_all_images[:, eigen_space_training_set_indices]
 
-    # Display the sample training images
-    training_set_images_2D = np.reshape(training_set_images, (28, 28, training_set_size))
-    print 'Displaying some sample images from the training set chosen... '
-    file_name = dir_name + '/' + file_prefix + 'sample_training_images.bmp'
-    display_digit_images(training_set_images_2D, 5, file_name)
+    # Display the sample training images used for eigen space construction
+    eigen_space_training_set_images_2D = np.reshape(eigen_space_training_set_images, (28, 28, num_eigen_vectors))
+    print 'Displaying some sample images from the training set chosen to construct eigen space... '
+    file_name = dir_name + '/' + file_prefix + 'sample_eigen_space_training_images.bmp'
+    display_digit_images(eigen_space_training_set_images_2D, 5, file_name)
     pause()
 
     # Find the eigen values and eigen vectors of the co-variance matrix
-    eigen_values, eigen_vectors_all = find_eigen_vectors(training_set_images)  # eigen_vectors: (784 x K)
-    eigen_vectors = eigen_vectors_all[:, 0: arg_num_eigen_vectors]
+    eigen_values, eigen_vectors = find_eigen_vectors(eigen_space_training_set_images)  # eigen_vectors: (784 x K)
 
     # Display the first 100 eigen vectors as images
-    eigen_vectors_2D = np.reshape(eigen_vectors, (28, 28, training_set_size))
+    eigen_vectors_2D = np.reshape(eigen_vectors, (28, 28, num_eigen_vectors))
     print 'Displaying few eigen vectors of the covariance matrix in decreasing order of eigen values...'
     file_name = dir_name + '/' + file_prefix + 'eigen_vectors_images.bmp'
     display_digit_images(eigen_vectors_2D, 5, file_name)
@@ -187,6 +185,20 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
 
     # Normalize the eigen vectors obtained
     eigen_vectors_normalized = normalize_columns(eigen_vectors)
+
+    # Construct a set of images as training set
+    training_set_size = arg_training_set_size
+    print '%d random images from the training set is chosen. ' % training_set_size
+    training_set_indices = np.random.randint(0, train_all_images.shape[1], training_set_size)
+    training_set_images = train_all_images[:, training_set_indices]
+    training_set_labels = train_all_labels[:, training_set_indices]
+
+    # Display a few sample training images
+    training_set_images_2D = np.reshape(training_set_images, (28, 28, training_set_size))
+    print 'Displaying some sample images from the training set chosen to construct eigen space... '
+    file_name = dir_name + '/' + file_prefix + 'sample_training_images.bmp'
+    display_digit_images(training_set_images_2D, 5, file_name)
+    pause()
 
     # Project the sample training set to eigen space and reconstruct them
     print 'Projecting the training set to eigen space and reconstructing...'
@@ -197,8 +209,6 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     file_name = dir_name + '/' + file_prefix + 'sample_training_images_reconstructed.bmp'
     display_digit_images(training_set_images_reconstructed_2D, 5, file_name)
     pause()
-
-    # eigen projected training set images and training set images sent to knn need not be same. vary both and examine results.
 
     # Select a test set
     test_set_size = arg_test_set_size
@@ -240,21 +250,21 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
 
 
 def driver():
-    # training_set_sizes = [10, 50, 100, 200, 350, 500, 800, 1000, 1500, 2500, 5000]
-    # test_set_sizes = [10, 50, 100, 200, 250, 500]
-    # knn_sizes = [1, 2, 3, 5, 8, 10, 15, 20, 30, 40, 50]
-    # eigen_vector_sizes = [10, 50, 100, 200, 500, 1000, 2500, 5000]
-    # experiment_number = 1
-    #
-    # for i in range(0, len(training_set_sizes)):
-    #     for j in range(0, len(test_set_sizes)):
-    #         for l in range(0, len(eigen_vector_sizes)):
-    #             for k in range(0, len(knn_sizes)):
-    #                 for difficulty in [0, 1]: # 0 for easy and 1 for difficult test set
-    #                     accuracy = 0.0
-    #                     for trial in range (1, 10): # do ten trials and take average accuracy
-    #                         print 'Calling eigen digits classification for parameters: training_set_size: %d test_set_size: %d knn_size: %d num_eigen_vectors: %d ' % (training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l])
-    #                         # eigen_digits_classify(training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l], difficulty, experiment_number, trial)
+    training_set_sizes = [10, 50, 100, 200, 350, 500, 800, 1000, 1500, 2500, 5000]
+    test_set_sizes = [10, 50, 100, 200, 250, 500]
+    knn_sizes = [1, 2, 3, 5, 8, 10, 15, 20, 30, 40, 50]
+    eigen_vector_sizes = [10, 50, 100, 200, 500, 1000, 2500, 5000]
+    experiment_number = 1
+
+    for i in range(0, len(training_set_sizes)):
+        for j in range(0, len(test_set_sizes)):
+            for l in range(0, len(eigen_vector_sizes)):
+                for k in range(0, len(knn_sizes)):
+                    for difficulty in [0, 1]: # 0 for easy and 1 for difficult test set
+                        accuracy = 0.0
+                        for trial in range (1, 10): # do ten trials and take average accuracy
+                            print 'Calling eigen digits classification for parameters: training_set_size: %d test_set_size: %d knn_size: %d num_eigen_vectors: %d ' % (training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l])
+                            # eigen_digits_classify(training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l], difficulty, experiment_number, trial)
     print 'Accuracy: %d' % eigen_digits_classify(500, 100, 5, 500, 1, 1, 1)
     return
 
