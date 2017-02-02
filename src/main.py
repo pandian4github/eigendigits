@@ -150,7 +150,7 @@ def get_accuracy(test_set_labels, actual_test_set_labels):
 
 def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size, arg_num_eigen_vectors, difficulty,
                           experiment_number, sub_experiment_number, trial_number):
-    dir_name = 'experiment' + `experiment_number`
+    dir_name = '../images_' + `experiment_number`
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
@@ -286,9 +286,10 @@ def print_divider_with_text(text):
 
 def driver():
     experiment_number = 1
-    # log_file_name = 'experiment' + `experiment_number` + '.log'
-    # print log_file_name
-    # sys.stdout = open(log_file_name, 'w')
+
+    plot_dir_name = '../plots_' + `experiment_number`
+    if not os.path.exists(plot_dir_name):
+        os.makedirs(plot_dir_name)
 
     eigen_vector_sizes = [10, 25, 50, 75, 100, 150, 200, 350, 500, 750]
     training_set_sizes = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000, 30000, 40000, 50000, 60000]
@@ -300,6 +301,7 @@ def driver():
     # test_set_sizes = [10, 50]
     # knn_sizes = [1, 2]
     # eigen_vector_sizes = [10, 50]
+    # total_trials = 1
 
     training_set_sizes_plt_extra_ul = 5000
     test_set_sizes_plt_extra_ul = 100
@@ -311,7 +313,6 @@ def driver():
     print_divider_with_text('Experiment ' + `experiment_number`)
     print 'Experiment starting with %d and sub_experiment %d' % (experiment_number, sub_experiment_number)
     print_divider()
-    plot_dir = 'plots'
 
     # Fix all parameters except num_eigen_vectors and find optimal value
     knn_size = 10
@@ -354,7 +355,7 @@ def driver():
         print 'Difficulty: ', difficulty_string[difficulty], ' max_num_eigen_vectors: ', max_num_eigen_vectors[difficulty]
 
     # Plot as graph and save to file
-    file_name = plot_dir + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'num_eigen_vectors_vs_accuracy.png'
+    file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'num_eigen_vectors_vs_accuracy.png'
     plot_graph(eigen_vector_sizes, plt_accuracies, 'Num eigen vectors', 'Accuracy',
                'Effect of number of eigen vectors on accuracy',
                [0, eigen_vector_sizes[-1] + eigen_vector_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name)
@@ -400,7 +401,7 @@ def driver():
         print 'Difficulty: ', difficulty_string[difficulty], ' max_training_set_size: ', max_training_set_size[difficulty]
 
     # Plot as graph and save to file
-    file_name = plot_dir + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'training_set_size_vs_accuracy.png'
+    file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'training_set_size_vs_accuracy.png'
     plot_graph(training_set_sizes, plt_accuracies, 'Training set size', 'Accuracy',
                'Effect of training_set_size on accuracy',
                [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name)
@@ -445,7 +446,7 @@ def driver():
         print 'Difficulty: ', difficulty_string[difficulty], ' max_test_set_size: ', max_test_set_size[difficulty]
 
     # Plot as graph and save to file
-    file_name = plot_dir + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'test_set_size_vs_accuracy.png'
+    file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'test_set_size_vs_accuracy.png'
     plot_graph(test_set_sizes, plt_accuracies, 'Test set size', 'Accuracy',
                'Effect of test_set_size on accuracy',
                [0, test_set_sizes[-1] + test_set_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name)
@@ -490,7 +491,7 @@ def driver():
         print 'Difficulty: ', difficulty_string[difficulty], ' max_knn_size: ', max_knn_size[difficulty]
 
     # Plot as graph and save to file
-    file_name = plot_dir + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'knn_size_vs_accuracy.png'
+    file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + 'knn_size_vs_accuracy.png'
     plot_graph(knn_sizes, plt_accuracies, 'Knn size', 'Accuracy',
                'Effect of knn size on accuracy',
                [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name)
@@ -506,7 +507,6 @@ def driver():
     #                         # eigen_digits_classify(training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l], difficulty, experiment_number, trial)
     # print 'Accuracy: %d' % eigen_digits_classify(10000, 500, 5, 500, 1, 1, 1)
 
-    sys.stdout.close()
     return
 
 
