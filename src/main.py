@@ -445,8 +445,8 @@ def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_s
     # Plot as graph and save to file
     file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + 'num_eigen_vectors_vs_accuracy.png'
     cum_time_taken = get_cumulative_plt_time(plt_time_taken)
-    plot_graph_with_time(eigen_vector_sizes, plt_accuracies, cum_time_taken, 'Num eigen vectors', 'Accuracy',
-                         'Time taken',
+    plot_graph_with_time(eigen_vector_sizes, plt_accuracies, cum_time_taken, 'Num eigen vectors', 'Accuracy (%)',
+                         'Time taken (sec)',
                          'Effect of number of eigen vectors on accuracy',
                          [0, eigen_vector_sizes[-1] + eigen_vector_sizes_plt_extra_ul,
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
@@ -510,8 +510,8 @@ def plot_training_set_size_vs_accuracy(experiment_number, sub_experiment_number,
     # Plot as graph and save to file
     file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + 'training_set_size_vs_accuracy.png'
     cum_time_taken = get_cumulative_plt_time(plt_time_taken)
-    plot_graph_with_time(training_set_sizes, plt_accuracies, cum_time_taken, 'Training set size', 'Accuracy',
-                         'Time taken',
+    plot_graph_with_time(training_set_sizes, plt_accuracies, cum_time_taken, 'Training set size', 'Accuracy (%)',
+                         'Time taken (sec)',
                          'Effect of training_set_size on accuracy',
                          [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul,
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
@@ -523,7 +523,7 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
                               max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
                               knn_sizes_plt_extra_ul, knn_type):
     # Fix all parameters but knn size and find optimal value
-    sub_experiment_number += 1
+    # sub_experiment_number += 1
     print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
     print get_time_string(), knn_type, ' Finding optimal value of knn_size by fixing test_set_size to %d, num_eigen_vectors to (%d, %d) and training_set_size to (%d, %d)' % (
     test_set_size, max_num_eigen_vectors[0], max_num_eigen_vectors[1], max_training_set_size[0],
@@ -578,7 +578,7 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
     # Plot as graph and save to file
     file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + 'knn_size_vs_accuracy.png'
     cum_time_taken = get_cumulative_plt_time(plt_time_taken)
-    plot_graph_with_time(knn_sizes, plt_accuracies, cum_time_taken, 'Knn size', 'Accuracy', 'Time taken',
+    plot_graph_with_time(knn_sizes, plt_accuracies, cum_time_taken, 'Knn size', 'Accuracy (%)', 'Time taken (sec)',
                          'Effect of knn size on accuracy',
                          [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100,
                           max(0, cum_time_taken[0] - 20), cum_time_taken[-1] + 20], file_name)
@@ -593,9 +593,9 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         os.makedirs(plot_dir_name)
 
     if arg_test == 0:
-        eigen_vector_sizes = [10, 25, 50, 75, 100, 150, 200, 350, 500, 750]
-        training_set_sizes = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 20000, 30000, 40000, 50000, 60000]
-        knn_sizes = [1, 2, 3, 5, 8, 10, 15, 20, 30, 40, 50, 75, 100]
+        eigen_vector_sizes = [5, 10, 15, 20, 25, 35, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750]
+        training_set_sizes = [10, 50, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000]
+        knn_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 75, 85, 100]
         total_trials = arg_total_trials
 
         training_set_sizes_plt_extra_ul = 5000
@@ -630,37 +630,46 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
     euclidean_max_num_eigen_vectors, euclidean_max_accuracies_eigen, euclidean_plt_accuracies_eigen, euclidean_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Euclidean')
+    sub_experiment_number += 1
     euclidean_max_training_set_size, euclidean_max_accuracies_training, euclidean_plt_accuracies_training, euclidean_plt_time_taken_training = plot_training_set_size_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, test_set_size, euclidean_max_num_eigen_vectors,
         training_set_sizes, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul,
         'Euclidean')
+    sub_experiment_number += 1
     euclidean_max_knn_size, euclidean_max_accuracies_knn, euclidean_plt_accuracies_knn, euclidean_plt_time_taken_knn = plot_knn_size_vs_accuracy(
         experiment_number, sub_experiment_number, test_set_size, euclidean_max_num_eigen_vectors,
         euclidean_max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
         knn_sizes_plt_extra_ul, 'Euclidean')
+    sub_experiment_number += 1
 
     cosine_max_num_eigen_vectors, cosine_max_accuracies_eigen, cosine_plt_accuracies_eigen, cosine_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Cosine')
+    sub_experiment_number += 1
     cosine_max_training_set_size, cosine_max_accuracies_training, cosine_plt_accuracies_training, cosine_plt_time_taken_training = plot_training_set_size_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, test_set_size, cosine_max_num_eigen_vectors,
         training_set_sizes, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul, 'Cosine')
+    sub_experiment_number += 1
     cosine_max_knn_size, cosine_max_accuracies_knn, cosine_plt_accuracies_knn, cosine_plt_time_taken_knn = plot_knn_size_vs_accuracy(
         experiment_number, sub_experiment_number, test_set_size, cosine_max_num_eigen_vectors,
         cosine_max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name, knn_sizes_plt_extra_ul,
         'Cosine')
+    sub_experiment_number += 1
 
     manhattan_max_num_eigen_vectors, manhattan_max_accuracies_eigen, manhattan_plt_accuracies_eigen, manhattan_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Manhattan')
+    sub_experiment_number += 1
     manhattan_max_training_set_size, manhattan_max_accuracies_training, manhattan_plt_accuracies_training, manhattan_plt_time_taken_training = plot_training_set_size_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, test_set_size, manhattan_max_num_eigen_vectors,
         training_set_sizes, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul,
         'Manhattan')
+    sub_experiment_number += 1
     manhattan_max_knn_size, manhattan_max_accuracies_knn, manhattan_plt_accuracies_knn, manhattan_plt_time_taken_knn = plot_knn_size_vs_accuracy(
         experiment_number, sub_experiment_number, test_set_size, manhattan_max_num_eigen_vectors,
         manhattan_max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
         knn_sizes_plt_extra_ul, 'Manhattan')
+    sub_experiment_number += 1
 
     for difficulty in [0, 1]:
         file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_knn_compare_eigen_vary_' + \
@@ -670,7 +679,7 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
              np.min(manhattan_plt_accuracies_eigen[difficulty])]))
         plot_graph_compare_knn(eigen_vector_sizes, euclidean_plt_accuracies_eigen[difficulty],
                                cosine_plt_accuracies_eigen[difficulty],
-                               manhattan_plt_accuracies_eigen[difficulty], 'Number of eigen vectors', 'Accuracy',
+                               manhattan_plt_accuracies_eigen[difficulty], 'Number of eigen vectors', 'Accuracy (%)',
                                'Comparsion of accuracy for types of distance in KNN (' + difficulty_string[
                                    difficulty] + ')',
                                [0, eigen_vector_sizes[-1] + eigen_vector_sizes_plt_extra_ul, accuracy_min_scale, 100],
@@ -683,7 +692,7 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
              np.min(manhattan_plt_accuracies_training[difficulty])]))
         plot_graph_compare_knn(training_set_sizes, euclidean_plt_accuracies_training[difficulty],
                                cosine_plt_accuracies_training[difficulty],
-                               manhattan_plt_accuracies_training[difficulty], 'Training set size', 'Accuracy',
+                               manhattan_plt_accuracies_training[difficulty], 'Training set size', 'Accuracy (%)',
                                'Comparsion of accuracy for types of distance in KNN (' + difficulty_string[
                                    difficulty] + ')',
                                [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul, accuracy_min_scale, 100],
@@ -696,7 +705,7 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
              np.min(manhattan_plt_accuracies_knn[difficulty])]))
         plot_graph_compare_knn(knn_sizes, euclidean_plt_accuracies_knn[difficulty],
                                cosine_plt_accuracies_knn[difficulty],
-                               manhattan_plt_accuracies_knn[difficulty], 'Knn size', 'Accuracy',
+                               manhattan_plt_accuracies_knn[difficulty], 'Knn size', 'Accuracy (%)',
                                'Comparsion of accuracy for types of distance in KNN (' + difficulty_string[
                                    difficulty] + ')',
                                [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, accuracy_min_scale, 100],
@@ -776,33 +785,43 @@ def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, ti
     ax1.set_xlim(left=axis[0], right=axis[1])
     ax1.set_ylim(bottom=axis[2], top=axis[3])
     ax2.set_ylim(bottom=axis[4], top=axis[5])
+    # ax1.set_xticks(x_ticks)
+    # ax1.set_yticks([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100])
 
     red_hard_patch = mpatches.Patch(color='red', label='Hard', linestyle='solid', linewidth=0.1)
     blue_easy_patch = mpatches.Patch(color='blue', label='Easy', linestyle='solid', linewidth=0.1)
     green_time_patch = mpatches.Patch(color='green', label='Time', linestyle='solid', linewidth=0.1)
 
-    plt.legend(handles=[blue_easy_patch, red_hard_patch, green_time_patch], loc=2)
+    lgd = plt.legend(handles=[blue_easy_patch, red_hard_patch, green_time_patch], loc='upper right', bbox_to_anchor=(1.3, 1.0))
 
-    plt.grid(True)
+    ax1.grid(True)
     plt.title(title)
-    # plt.show()
-    plt.savefig(file_name)
+
+    fig = plt.figure(1)
+    fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+    # plt.savefig(file_name)
+    # fig.savefig('image_output.png', dpi = 400, format = 'png', bbox_extra_artists = (lgd,), bbox_inches = 'tight')
     plt.close()
 
 
 def test_pyplot():
-    accuracies = [[78.5, 89.2, 98.3], [45.6, 74.5, 82.3]]
-    time_taken = [50, 70, 90]
-    training_set_sizes = [15000, 30000, 50000]
+    accuracies = [[56, 65, 76, 84, 98.5, 78.5, 89.2, 98.3], [43, 54, 64, 76, 93.2, 45.6, 74.5, 82.3]]
+    time_taken = [10, 20, 25, 28, 30, 50, 70, 90]
+    training_set_sizes = [10, 50, 100, 500, 1000, 15000, 30000, 50000]
+    xticks = []
+    i = 0
+    while i <= 60000:
+        xticks.extend([i])
+        i += 5000
+
     xlabel = 'Training set size'
-    ylabel = 'Accuracy'
-    y2label = 'Time'
+    ylabel = 'Accuracy (%)'
+    y2label = 'Time taken (sec)'
     title = 'Effect of training set size on accuracy'
-    axis = [0, 60000, 30, 100]
-    plot_graph_with_time(training_set_sizes, accuracies, time_taken, xlabel, ylabel, y2label, title, axis, 'sample.png')
+    axis = [0, 60000, 30, 100, 0, 100]
+    plot_graph_with_time(training_set_sizes, xticks, accuracies, time_taken, xlabel, ylabel, y2label, title, axis, 'sample.png')
 
-
-parse_command_line_args(sys.argv)
 
 def adhoc():
     eigen_digits_classify(30000, 500, 10, 250, 1, 5, 1, 1, 'Manhattan')
@@ -810,5 +829,6 @@ def adhoc():
     print get_time_string(), get_cumulative_plt_time(plt_times)
 
 
+parse_command_line_args(sys.argv)
 # adhoc()
 # test_pyplot()
