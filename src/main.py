@@ -451,6 +451,12 @@ def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_s
                          [0, eigen_vector_sizes[-1] + eigen_vector_sizes_plt_extra_ul,
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
                           cum_time_taken[-1] + 20], file_name)
+
+    print knn_type, ' max_num_eigen_vectors: ', max_num_eigen_vectors
+    print knn_type, ' max_accuracies: ', max_accuracies
+    print knn_type, ' plt_accuracies: ', plt_accuracies
+    print knn_type, ' plt_time_taken: ', plt_time_taken
+
     return max_num_eigen_vectors, max_accuracies, plt_accuracies, plt_time_taken
 
 
@@ -516,6 +522,12 @@ def plot_training_set_size_vs_accuracy(experiment_number, sub_experiment_number,
                          [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul,
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
                           cum_time_taken[-1] + 20], file_name)
+
+    print knn_type, ' max_training_set_size: ', max_training_set_size
+    print knn_type, ' max_accuracies: ', max_accuracies
+    print knn_type, ' plt_accuracies: ', plt_accuracies
+    print knn_type, ' plt_time_taken: ', plt_time_taken
+
     return max_training_set_size, max_accuracies, plt_accuracies, plt_time_taken
 
 
@@ -523,7 +535,6 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
                               max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
                               knn_sizes_plt_extra_ul, knn_type):
     # Fix all parameters but knn size and find optimal value
-    # sub_experiment_number += 1
     print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
     print get_time_string(), knn_type, ' Finding optimal value of knn_size by fixing test_set_size to %d, num_eigen_vectors to (%d, %d) and training_set_size to (%d, %d)' % (
     test_set_size, max_num_eigen_vectors[0], max_num_eigen_vectors[1], max_training_set_size[0],
@@ -582,6 +593,12 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
                          'Effect of knn size on accuracy',
                          [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100,
                           max(0, cum_time_taken[0] - 20), cum_time_taken[-1] + 20], file_name)
+
+    print knn_type, ' max_knn_size: ', max_knn_size
+    print knn_type, ' max_accuracies: ', max_accuracies
+    print knn_type, ' plt_accuracies: ', plt_accuracies
+    print knn_type, ' plt_time_taken: ', plt_time_taken
+
     return max_knn_size, max_accuracies, plt_accuracies, plt_time_taken
 
 
