@@ -452,10 +452,10 @@ def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_s
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
                           cum_time_taken[-1] + 20], file_name)
 
-    print knn_type, ' max_num_eigen_vectors: ', max_num_eigen_vectors
-    print knn_type, ' max_accuracies: ', max_accuracies
-    print knn_type, ' plt_accuracies: ', plt_accuracies
-    print knn_type, ' plt_time_taken: ', plt_time_taken
+    print get_time_string(), knn_type,  ' max_num_eigen_vectors: ', max_num_eigen_vectors
+    print get_time_string(), knn_type,  ' max_accuracies: ', max_accuracies
+    print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+    print get_time_string(), knn_type,  ' plt_time_taken: ', plt_time_taken
 
     return max_num_eigen_vectors, max_accuracies, plt_accuracies, plt_time_taken
 
@@ -523,10 +523,10 @@ def plot_training_set_size_vs_accuracy(experiment_number, sub_experiment_number,
                           get_min_axis_for_accuracy(min_accuracy), 100, max(0, cum_time_taken[0] - 20),
                           cum_time_taken[-1] + 20], file_name)
 
-    print knn_type, ' max_training_set_size: ', max_training_set_size
-    print knn_type, ' max_accuracies: ', max_accuracies
-    print knn_type, ' plt_accuracies: ', plt_accuracies
-    print knn_type, ' plt_time_taken: ', plt_time_taken
+    print get_time_string(), knn_type,  ' max_training_set_size: ', max_training_set_size
+    print get_time_string(), knn_type,  ' max_accuracies: ', max_accuracies
+    print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+    print get_time_string(), knn_type,  ' plt_time_taken: ', plt_time_taken
 
     return max_training_set_size, max_accuracies, plt_accuracies, plt_time_taken
 
@@ -594,10 +594,10 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
                          [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100,
                           max(0, cum_time_taken[0] - 20), cum_time_taken[-1] + 20], file_name)
 
-    print knn_type, ' max_knn_size: ', max_knn_size
-    print knn_type, ' max_accuracies: ', max_accuracies
-    print knn_type, ' plt_accuracies: ', plt_accuracies
-    print knn_type, ' plt_time_taken: ', plt_time_taken
+    print get_time_string(), knn_type,  ' max_knn_size: ', max_knn_size
+    print get_time_string(), knn_type,  ' max_accuracies: ', max_accuracies
+    print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+    print get_time_string(), knn_type,  ' plt_time_taken: ', plt_time_taken
 
     return max_knn_size, max_accuracies, plt_accuracies, plt_time_taken
 
@@ -744,6 +744,15 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
 
 def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, title, axis, file_name):
     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
+
+    print get_time_string(), 'x_axis: ', x_axis
+    print get_time_string(), 'y_axis1: ', y_axis1
+    print get_time_string(), 'y_axis2: ', y_axis2
+    print get_time_string(), 'y_axis3: ', y_axis3
+    print get_time_string(), 'x_label: ', x_label
+    print get_time_string(), 'y_label: ', y_label
+    print get_time_string(), 'axis: ', axis
+
     plt.plot(x_axis, y_axis1, 'r-o', label='euclidean')
     plt.plot(x_axis, y_axis2, 'b-o', label='cosine')
     plt.plot(x_axis, y_axis3, 'g-o', label='manhattan')
@@ -764,29 +773,35 @@ def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, 
     plt.close()
 
 
-def plot_graph(x_axis, y_axis, x_label, y_label, title, axis, file_name):
-    print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
-    plt.plot(x_axis, y_axis[0], 'r-o', label='hard')
-    plt.plot(x_axis, y_axis[1], 'b-o', label='easy')
-
-    red_hard_patch = mpatches.Patch(color='red', label='Hard', linestyle='solid', linewidth=0.1)
-    blue_easy_patch = mpatches.Patch(color='blue', label='Easy', linestyle='solid', linewidth=0.1)
-    plt.legend(handles=[blue_easy_patch, red_hard_patch], loc=2)
-
-    plt.grid(True)
-    plt.axis(axis)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-    # plt.show()
-    plt.savefig(file_name)
-    plt.close()
+# def plot_graph(x_axis, y_axis, x_label, y_label, title, axis, file_name):
+#     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
+#     plt.plot(x_axis, y_axis[0], 'r-o', label='hard')
+#     plt.plot(x_axis, y_axis[1], 'b-o', label='easy')
+#
+#     red_hard_patch = mpatches.Patch(color='red', label='Hard', linestyle='solid', linewidth=0.1)
+#     blue_easy_patch = mpatches.Patch(color='blue', label='Easy', linestyle='solid', linewidth=0.1)
+#     plt.legend(handles=[blue_easy_patch, red_hard_patch], loc=2)
+#
+#     plt.grid(True)
+#     plt.axis(axis)
+#     plt.xlabel(x_label)
+#     plt.ylabel(y_label)
+#     plt.title(title)
+#     # plt.show()
+#     plt.savefig(file_name)
+#     plt.close()
 
 
 def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, title, axis, file_name):
     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
-    # print get_time_string(), 'axis: ', axis
-    # print get_time_string(), 'y2_axis: ', y2_axis
+
+    print get_time_string(), 'x_axis: ', x_axis
+    print get_time_string(), 'y_axis: ', y_axis
+    print get_time_string(), 'y2_axis: ', y2_axis
+    print get_time_string(), 'x_label: ', x_label
+    print get_time_string(), 'y_label: ', y_label
+    print get_time_string(), 'y2_label: ', y2_label
+    print get_time_string(), 'axis: ', axis
 
     fig, ax1 = plt.subplots()
 
