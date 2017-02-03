@@ -761,15 +761,21 @@ def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, 
     blue_cosine_patch = mpatches.Patch(color='blue', label='Cosine', linestyle='solid', linewidth=0.1)
     green_manhattan_patch = mpatches.Patch(color='green', label='Manhattan', linestyle='solid', linewidth=0.1)
 
-    plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc=2)
+    # plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc=2)
+
+    lgd = plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc='upper right', bbox_to_anchor=(1.4, 1.0))
 
     plt.grid(True)
     plt.axis(axis)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
+
+    fig = plt.figure(1)
+    fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+
     # plt.show()
-    plt.savefig(file_name)
+    # plt.savefig(file_name)
     plt.close()
 
 
@@ -837,6 +843,10 @@ def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, ti
     plt.close()
 
 
+def test_pyplot2():
+    plot_graph_compare_knn([50, 100, 500, 1000, 5000, 10000, 25000, 50000, 60000], [23.5, 34.5, 45.5, 67, 76, 79, 84, 87, 92],  [22, 33, 44, 63, 71, 75, 80, 84, 89], [18, 30, 41, 60, 69, 72, 28, 81, 86], 'Training set size', 'Accuracy (%)', 'Training set size vs Accuracy', [0, 70000, 0, 100], 'sample2.png')
+
+
 def test_pyplot():
     accuracies = [[56, 65, 76, 84, 98.5, 78.5, 89.2, 98.3], [43, 54, 64, 76, 93.2, 45.6, 74.5, 82.3]]
     time_taken = [10, 20, 25, 28, 30, 50, 70, 90]
@@ -863,4 +873,4 @@ def adhoc():
 
 parse_command_line_args(sys.argv)
 # adhoc()
-# test_pyplot()
+# test_pyplot2()
