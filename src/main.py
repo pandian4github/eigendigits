@@ -15,27 +15,27 @@ import time
 # digits matrix should be of dimension at least 28*28*grid_size
 def display_digit_images(digits_matrix, grid_size, image_name):
     # grid_size = 2
-    grid_size += 1
+    # grid_size += 1
     group_image = np.zeros((28 * grid_size, 28 * grid_size))
 
     # print get_time_string(), group_image.shape
     # print get_time_string(), digits_matrix.shape
 
-    for i in range(1, grid_size):
-        for j in range(1, grid_size):
+    for i in range(1, grid_size+1):
+        for j in range(1, grid_size+1):
             if (i - 1) * grid_size + j - 1 >= digits_matrix.shape[2]:
                 break
             group_image[(i - 1) * 28: i * 28, (j - 1) * 28: j * 28] = digits_matrix[:, :, (i - 1) * grid_size + j - 1]
     img = Image.fromarray(group_image)
     # print get_time_string(), image_name
     img_rgb = img.convert('RGB')
-    img_rgb.save(image_name, 'bmp')
+    img_rgb.save(image_name, 'jpeg')
     # img.show()
     return
 
 
 # Takes training set images as input and returns the eigen values and eigen vectors of the set in decreasing order
-def find_eigen_vectors(training_set_images):
+def hw1FindEigendigits(training_set_images):
     # Compute the mean of the columns in the chosen sample images
     training_set_images_mean = np.mean(training_set_images, axis=1)
 
@@ -60,7 +60,11 @@ def find_eigen_vectors(training_set_images):
         sorted_eigen_values[num_eigen_values - 1 - i] = eigen_values[sort_indices[i]]
         sorted_eigen_vectors[:, num_eigen_values - 1 - i] = eigen_vectors[:, sort_indices[i]]
 
-    return sorted_eigen_values, sorted_eigen_vectors
+
+    # Normalize the eigen vectors obtained
+    eigen_vectors_normalized = normalize_columns(sorted_eigen_vectors)
+
+    return training_set_images_mean, sorted_eigen_vectors, eigen_vectors_normalized
 
 
 # Given a matrix, normalize each column (each eigen vector) of the matrix
@@ -241,22 +245,19 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     # Display the sample training images used for eigen space construction
     eigen_space_training_set_images_2D = np.reshape(eigen_space_training_set_images, (28, 28, num_eigen_vectors))
     print get_time_string(), 'Displaying some sample images from the training set chosen to construct eigen space... '
-    file_name = dir_name + '/' + file_prefix + 'sample_eigen_space_training_images.bmp'
+    file_name = dir_name + '/' + file_prefix + 'sample_eigen_space_training_images.jpeg'
     display_digit_images(eigen_space_training_set_images_2D, 5, file_name)
     pause()
 
     # Find the eigen values and eigen vectors of the co-variance matrix
-    eigen_values, eigen_vectors = find_eigen_vectors(eigen_space_training_set_images)  # eigen_vectors: (784 x K)
+    training_set_images_mean, eigen_vectors, eigen_vectors_normalized = hw1FindEigendigits(eigen_space_training_set_images)  # eigen_vectors: (784 x K)
 
     # Display the first 100 eigen vectors as images
     eigen_vectors_2D = np.reshape(eigen_vectors, (28, 28, num_eigen_vectors))
     print get_time_string(), 'Displaying few eigen vectors of the covariance matrix in decreasing order of eigen values...'
-    file_name = dir_name + '/' + file_prefix + 'eigen_vectors_images.bmp'
+    file_name = dir_name + '/' + file_prefix + 'eigen_vectors_images.jpeg'
     display_digit_images(eigen_vectors_2D, 5, file_name)
     pause()
-
-    # Normalize the eigen vectors obtained
-    eigen_vectors_normalized = normalize_columns(eigen_vectors)
 
     # Construct a set of images as training set
     training_set_size = arg_training_set_size
@@ -268,7 +269,7 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     # Display a few sample training images
     training_set_images_2D = np.reshape(training_set_images, (28, 28, training_set_size))
     print get_time_string(), 'Displaying some sample images from the training set chosen to construct eigen space... '
-    file_name = dir_name + '/' + file_prefix + 'sample_training_images.bmp'
+    file_name = dir_name + '/' + file_prefix + 'sample_training_images.jpeg'
     display_digit_images(training_set_images_2D, 5, file_name)
     pause()
 
@@ -278,7 +279,7 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     training_set_images_reconstructed = np.dot(eigen_vectors_normalized, training_set_images_eigen_projected)
     training_set_images_reconstructed_2D = np.reshape(training_set_images_reconstructed, (28, 28, training_set_size))
     print get_time_string(), 'Displaying a few reconstructed images from the training set...'
-    file_name = dir_name + '/' + file_prefix + 'sample_training_images_reconstructed.bmp'
+    file_name = dir_name + '/' + file_prefix + 'sample_training_images_reconstructed.jpeg'
     display_digit_images(training_set_images_reconstructed_2D, 5, file_name)
     pause()
 
@@ -295,7 +296,7 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     # Display the sample test images
     test_set_images_2D = np.reshape(test_set_images, (28, 28, test_set_size))
     print get_time_string(), 'Displaying some sample images from the test set chosen... '
-    file_name = dir_name + '/' + file_prefix + 'sample_test_images.bmp'
+    file_name = dir_name + '/' + file_prefix + 'sample_test_images.jpeg'
     display_digit_images(test_set_images_2D, 5, file_name)
     pause()
 
@@ -305,7 +306,7 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     test_set_images_reconstructed = np.dot(eigen_vectors_normalized, test_set_images_eigen_projected)
     test_set_images_reconstructed_2D = np.reshape(test_set_images_reconstructed, (28, 28, test_set_size))
     print get_time_string(), 'Displaying a few reconstructed images from the test set...'
-    file_name = dir_name + '/' + file_prefix + 'sample_test_images_reconstructed.bmp'
+    file_name = dir_name + '/' + file_prefix + 'sample_test_images_reconstructed.jpeg'
     display_digit_images(test_set_images_reconstructed_2D, 5, file_name)
     pause()
 
@@ -343,8 +344,8 @@ def print_divider_with_text(text):
     return
 
 
-def print_usage():
-    print 'python -u main.py [<experiment_number>] [<number_of_trials_for_each_sub_experiment>] [<test>]'
+def print_usage_batch():
+    print 'python -u main.py batch [<experiment_number>] [<number_of_trials_for_each_sub_experiment>] [<test>]'
     return
 
 
@@ -361,33 +362,41 @@ def get_time_string():
 
 def parse_command_line_args(sys_arg):
     print get_time_string(), 'Number of arguments: %d' % len(sys_arg)
-    experiment_number = 0
+    experiment_number = -1
     number_of_trials = 0
     test = 1
-    if len(sys_arg) == 1 or len(sys_arg) == 0:  # Default values
+    if len(sys_arg) == 2 or len(sys_arg) == 1:  # Default values
         experiment_number = 1
         number_of_trials = 5
         test = 1
-    if len(sys_arg) == 2:
-        experiment_number = int(sys_arg[1])
+    if len(sys_arg) == 3:
+        experiment_number = int(sys_arg[2])
         number_of_trials = 5
         test = 0
-    if len(sys_arg) == 3:
-        experiment_number = int(sys_arg[1])
-        number_of_trials = int(sys_arg[2])
-        test = 0
     if len(sys_arg) == 4:
-        experiment_number = int(sys_arg[1])
-        number_of_trials = int(sys_arg[2])
-        if sys_arg[3] == 'test':
+        experiment_number = int(sys_arg[2])
+        number_of_trials = int(sys_arg[3])
+        test = 0
+    if len(sys_arg) == 5:
+        experiment_number = int(sys_arg[2])
+        number_of_trials = int(sys_arg[3])
+        if sys_arg[4] == 'test':
             test = 1
         else:
-            print_usage()
+            print_usage_batch()
             return
-    if experiment_number == 0:
-        print_usage()
+    if experiment_number == -1:
+        print_usage_batch()
         return
     driver(experiment_number, number_of_trials, test)
+
+
+def parse_command_line_args_adhoc(sys_arg):
+    # print get_time_string(), 'Number of arguments: %d' % len(sys_arg)
+    if len(sys_arg) != 9:
+        print_usage_adhoc()
+        return -1, -1, -1, -1, -1, -1, -1
+    return sys_arg[2], sys_arg[3], sys_arg[4], sys_arg[5], sys_arg[6], sys_arg[7], sys_arg[8]
 
 
 def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size,
@@ -610,12 +619,12 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         os.makedirs(plot_dir_name)
 
     if arg_test == 0:
-        eigen_vector_sizes = [5, 10, 15, 20, 25, 35, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750]
-        training_set_sizes = [10, 50, 100, 250, 500, 1000, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000]
-        knn_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 75, 85, 100]
+        eigen_vector_sizes = [5, 10, 15, 20, 25, 35, 40, 45, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500]
+        training_set_sizes = [5, 10, 15, 20, 30, 40, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
+        knn_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 22, 25, 28, 30, 35, 40, 45, 50, 60, 75, 100]
         total_trials = arg_total_trials
 
-        training_set_sizes_plt_extra_ul = 5000
+        training_set_sizes_plt_extra_ul = 1000
         knn_sizes_plt_extra_ul = 10
         eigen_vector_sizes_plt_extra_ul = 100
     else:
@@ -636,10 +645,10 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
     print_divider()
 
     # Fix all parameters except num_eigen_vectors and find optimal value
-    knn_size = 10
+    knn_size = 5
     if arg_test == 0:
-        training_set_size = 50000
-        test_set_size = 500
+        training_set_size = 5000
+        test_set_size = 100
     else:
         training_set_size = 100
         test_set_size = 50
@@ -658,6 +667,7 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         euclidean_max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
         knn_sizes_plt_extra_ul, 'Euclidean')
     sub_experiment_number += 1
+
 
     cosine_max_num_eigen_vectors, cosine_max_accuracies_eigen, cosine_plt_accuracies_eigen, cosine_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
@@ -740,6 +750,261 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
     # print get_time_string(), 'Accuracy: %d' % eigen_digits_classify(10000, 500, 5, 500, 1, 1, 1)
 
     return
+
+
+def tune_num_eigen_vectors(knn_size, experiment_number):
+    training_set_sizes = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000]
+    training_set_sizes_plt_extra_ul = 1000
+    eigen_vector_sizes = [10, 50, 100, 250, 500]
+    # knn_size = 5
+    # experiment_number = 51
+    difficulty_string = ['hard', 'easy']
+    total_trials = 1
+    plot_dir_name = '../plots_' + `experiment_number`
+    if not os.path.exists(plot_dir_name):
+        os.makedirs(plot_dir_name)
+    plot_tune_num_eigen_vectors(experiment_number, 1, 500, eigen_vector_sizes, training_set_sizes, knn_size, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul, knn_type='Euclidean')
+
+
+def plot_tune_num_eigen_vectors(experiment_number, sub_experiment_number, test_set_size, eigen_vector_sizes,
+                              training_set_sizes, knn_size, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul, knn_type):
+    # Plot accuracy vs training set size for different values of num_eigen_vectors
+    print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
+    print get_time_string(), knn_type, ' Finding plots of accuracy vs training set for different values of eigen vectors for knn size: ', knn_size
+    print_divider()
+
+    min_accuracy = 100.0
+    num_plots = len(eigen_vector_sizes)
+    num_training_set_sizes = len(training_set_sizes)
+    plt_accuracies = [[[0.0 for k in xrange(num_training_set_sizes)] for j in xrange(num_plots)] for i in xrange(2)]
+
+    colors = ['blue', 'green', 'red', 'magenta', 'cyan']
+    linestyles = ['b-o', 'g-o', 'r-o', 'm-o', 'c-o']
+
+    for difficulty in [0, 1]:
+        print_divider_with_text('Difficulty ' + `difficulty`)
+        j = 0
+        legends = []
+        for num_eigen_vectors in eigen_vector_sizes:
+            k = 0
+            legends.extend([`num_eigen_vectors` + ' eigen vectors'])
+            print_divider_with_text('Num eigen vectors ' + `num_eigen_vectors`)
+            for training_set_size in training_set_sizes:
+                print_divider_with_text('Training set size ' + `training_set_size`)
+                total_accuracy = 0.0
+                # total_time = 0.0
+                num_trials = 0
+                for trial in range(total_trials):
+                    print_divider_with_text('Trial ' + `trial`)
+                    # start_time = time.time()
+                    total_accuracy += eigen_digits_classify(training_set_size,
+                                                            test_set_size, knn_size,
+                                                            num_eigen_vectors, difficulty,
+                                                            experiment_number, sub_experiment_number, trial, knn_type)
+                    # total_time += time.time() - start_time
+                    print_divider()
+                    num_trials += 1
+                accuracy = total_accuracy / float(num_trials)
+                # avg_time = total_time / float(num_trials)
+                plt_accuracies[difficulty][j][k] = accuracy
+                if accuracy < min_accuracy:
+                    min_accuracy = accuracy
+                k += 1
+            j += 1
+
+        print get_time_string(), 'Difficulty: ', difficulty_string[difficulty], ' Accuracies obtained: ', plt_accuracies[difficulty]
+
+        # Plot as graph and save to file
+        file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + difficulty_string[difficulty] + '_' + `knn_size` + '_' + 'tune_num_eigen_vectors.png'
+        print 'Plotting tuning of num_eigen_vectors for difficulty ', difficulty
+        plot_tune_graph(training_set_sizes, plt_accuracies[difficulty], linestyles, legends, colors, 'Training set size', 'Accuracy (%)',
+                             'Training set size vs Accuracy for different eigen vectors',
+                             [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name, 1.5, 1.0)
+        print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+
+    return
+
+
+def tune_training_set_size(num_eigen_vectors, experiment_number):
+    training_set_sizes = [100, 250, 500, 1000, 5000]
+    knn_sizes_plt_extra_ul = 5
+    knn_sizes = [1, 2, 3, 4, 5, 6, 7, 9, 13, 16, 20, 25, 35, 45, 50]
+    # num_eigen_vectors = 500
+    # experiment_number = 51
+    difficulty_string = ['hard', 'easy']
+    total_trials = 1
+    plot_dir_name = '../plots_' + `experiment_number`
+    if not os.path.exists(plot_dir_name):
+        os.makedirs(plot_dir_name)
+    plot_tune_training_set_size(experiment_number, 1, 500, num_eigen_vectors, training_set_sizes, knn_sizes, total_trials, difficulty_string, plot_dir_name, knn_sizes_plt_extra_ul, knn_type='Euclidean')
+
+
+def plot_tune_training_set_size(experiment_number, sub_experiment_number, test_set_size, num_eigen_vectors,
+                              training_set_sizes, knn_sizes, total_trials, difficulty_string, plot_dir_name, knn_sizes_plt_extra_ul, knn_type):
+    # Plot accuracy vs training set size for different values of num_eigen_vectors
+    print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
+    print get_time_string(), knn_type, ' Finding plots of accuracy vs knn size for different values of trainin set size for num_eigen_vectors: ', num_eigen_vectors
+    print_divider()
+
+    min_accuracy = 100.0
+    num_plots = len(training_set_sizes)
+    num_knn_sizes = len(knn_sizes)
+    plt_accuracies = [[[0.0 for k in xrange(num_knn_sizes)] for j in xrange(num_plots)] for i in xrange(2)]
+
+    colors = ['blue', 'green', 'red', 'magenta', 'cyan']
+    linestyles = ['b-o', 'g-o', 'r-o', 'm-o', 'c-o']
+
+    for difficulty in [0, 1]:
+        print_divider_with_text('Difficulty ' + `difficulty`)
+        j = 0
+        legends = []
+        for training_set_size in training_set_sizes:
+            k = 0
+            legends.extend([`training_set_size` + ' training set'])
+            print_divider_with_text('Training set ' + `training_set_size`)
+            for knn_size in knn_sizes:
+                print_divider_with_text('Knn size ' + `knn_size`)
+                total_accuracy = 0.0
+                # total_time = 0.0
+                num_trials = 0
+                for trial in range(total_trials):
+                    print_divider_with_text('Trial ' + `trial`)
+                    # start_time = time.time()
+                    total_accuracy += eigen_digits_classify(training_set_size,
+                                                            test_set_size, knn_size,
+                                                            num_eigen_vectors, difficulty,
+                                                            experiment_number, sub_experiment_number, trial, knn_type)
+                    # total_time += time.time() - start_time
+                    print_divider()
+                    num_trials += 1
+                accuracy = total_accuracy / float(num_trials)
+                # avg_time = total_time / float(num_trials)
+                plt_accuracies[difficulty][j][k] = accuracy
+                if accuracy < min_accuracy:
+                    min_accuracy = accuracy
+                k += 1
+            j += 1
+
+        print get_time_string(), 'Difficulty: ', difficulty_string[difficulty], ' Accuracies obtained: ', plt_accuracies[difficulty]
+
+        # Plot as graph and save to file
+        file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + difficulty_string[difficulty] + '_' + `num_eigen_vectors` + '_' + 'tune_training_set_size.png'
+        print 'Plotting tuning of training set size for difficulty ', difficulty
+        plot_tune_graph(knn_sizes, plt_accuracies[difficulty], linestyles, legends, colors, 'Knn size', 'Accuracy (%)',
+                             'Knn size vs Accuracy for different training set sizes',
+                             [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name, 1.5, 1.0)
+        print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+
+    return
+
+
+def tune_knn_size(num_eigen_vectors, experiment_number):
+    training_set_sizes = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000]
+    training_set_sizes_plt_extra_ul = 1000
+    knn_sizes = [1, 2, 3, 5, 8]
+    # knn_size = 5
+    # experiment_number = 51
+    difficulty_string = ['hard', 'easy']
+    total_trials = 1
+    plot_dir_name = '../plots_' + `experiment_number`
+    if not os.path.exists(plot_dir_name):
+        os.makedirs(plot_dir_name)
+    plot_tune_knn_sizes(experiment_number, 1, 500, num_eigen_vectors, training_set_sizes, knn_sizes, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul, knn_type='Euclidean')
+
+
+def plot_tune_knn_sizes(experiment_number, sub_experiment_number, test_set_size, num_eigen_vectors,
+                              training_set_sizes, knn_sizes, total_trials, difficulty_string, plot_dir_name, training_set_sizes_plt_extra_ul, knn_type):
+    # Plot accuracy vs training set size for different values of num_eigen_vectors
+    print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
+    print get_time_string(), knn_type, ' Finding plots of accuracy vs training set for different values of knn for num_eigen_vectors: ', num_eigen_vectors
+    print_divider()
+
+    min_accuracy = 100.0
+    num_plots = len(knn_sizes)
+    num_training_set_sizes = len(training_set_sizes)
+    plt_accuracies = [[[0.0 for k in xrange(num_training_set_sizes)] for j in xrange(num_plots)] for i in xrange(2)]
+
+    colors = ['blue', 'green', 'red', 'magenta', 'cyan']
+    linestyles = ['b-o', 'g-o', 'r-o', 'm-o', 'c-o']
+
+    for difficulty in [0, 1]:
+        print_divider_with_text('Difficulty ' + `difficulty`)
+        j = 0
+        legends = []
+        for knn_size in knn_sizes:
+            k = 0
+            legends.extend([`knn_size` + ' k-NN'])
+            print_divider_with_text('Knn size ' + `knn_size`)
+            for training_set_size in training_set_sizes:
+                print_divider_with_text('Training set size ' + `training_set_size`)
+                total_accuracy = 0.0
+                # total_time = 0.0
+                num_trials = 0
+                for trial in range(total_trials):
+                    print_divider_with_text('Trial ' + `trial`)
+                    # start_time = time.time()
+                    total_accuracy += eigen_digits_classify(training_set_size,
+                                                            test_set_size, knn_size,
+                                                            num_eigen_vectors, difficulty,
+                                                            experiment_number, sub_experiment_number, trial, knn_type)
+                    # total_time += time.time() - start_time
+                    print_divider()
+                    num_trials += 1
+                accuracy = total_accuracy / float(num_trials)
+                # avg_time = total_time / float(num_trials)
+                plt_accuracies[difficulty][j][k] = accuracy
+                if accuracy < min_accuracy:
+                    min_accuracy = accuracy
+                k += 1
+            j += 1
+
+        print get_time_string(), 'Difficulty: ', difficulty_string[difficulty], ' Accuracies obtained: ', plt_accuracies[difficulty]
+
+        # Plot as graph and save to file
+        file_name = plot_dir_name + '/' + `experiment_number` + '_' + `sub_experiment_number` + '_' + knn_type + '_' + difficulty_string[difficulty] + '_' + `num_eigen_vectors` + '_' + 'tune_knn_size.png'
+        print 'Plotting tuning of knn_size for difficulty ', difficulty
+        plot_tune_graph(training_set_sizes, plt_accuracies[difficulty], linestyles, legends, colors, 'Training set size', 'Accuracy (%)',
+                             'Training set size vs Accuracy for different eigen vectors',
+                             [0, training_set_sizes[-1] + training_set_sizes_plt_extra_ul, get_min_axis_for_accuracy(min_accuracy), 100], file_name, 1.4, 1.0)
+        print get_time_string(), knn_type,  ' plt_accuracies: ', plt_accuracies
+
+    return
+
+
+def plot_tune_graph(x_axis, y_axis, linestyles, legends, colors, x_label, y_label, title, axis, file_name, bba_x, bba_y):
+    print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
+
+    print get_time_string(), 'x_axis: ', x_axis
+    print get_time_string(), 'y_axis: ', y_axis
+    print get_time_string(), 'linestyles: ', linestyles
+    print get_time_string(), 'legends: ', legends
+    print get_time_string(), 'colors: ', colors
+    print get_time_string(), 'x_label: ', x_label
+    print get_time_string(), 'y_label: ', y_label
+    print get_time_string(), 'axis: ', axis
+
+    num_plots = len(legends)
+    patches = []
+    for i in range(num_plots):
+        plt.plot(x_axis, y_axis[i], linestyles[i], label=legends[i])
+        patches.extend([mpatches.Patch(color=colors[i], label=legends[i], linestyle='solid', linewidth=0.1)])
+
+    # plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc=2)
+
+    lgd = plt.legend(handles=patches, loc='upper right', bbox_to_anchor=(bba_x, bba_y))
+
+    plt.grid(True)
+    plt.axis(axis)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+
+    fig = plt.figure(1)
+    fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+    # plt.show()
+    # plt.savefig(file_name)
+    plt.close()
 
 
 def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, title, axis, file_name):
@@ -865,12 +1130,54 @@ def test_pyplot():
     plot_graph_with_time(training_set_sizes, xticks, accuracies, time_taken, xlabel, ylabel, y2label, title, axis, 'sample.png')
 
 
-def adhoc():
-    eigen_digits_classify(30000, 500, 10, 250, 1, 5, 1, 1, 'Manhattan')
-    plt_times = [[3, 5, 6], [4, 1, 3]]
-    print get_time_string(), get_cumulative_plt_time(plt_times)
+def print_usage_adhoc():
+    print 'python -u main.py single <training_set_size> <test_set_size> <knn_size> <num_eigen_vectors> <difficulty> <experiment_number> <knn_distance_type>'
+    return
 
 
-parse_command_line_args(sys.argv)
-# adhoc()
+def adhoc(sys_arg):
+    training_set_size, test_set_size, knn_size, num_eigen_vectors, difficulty, experiment_number, knn_distance_type = parse_command_line_args_adhoc(sys_arg)
+    if training_set_size == -1:
+        return
+    accuracy = eigen_digits_classify(int(training_set_size), int(test_set_size), int(knn_size), int(num_eigen_vectors), int(difficulty), int(experiment_number), 1, 1, 'Euclidean')
+    print 'Accuracy obtained: ', accuracy
+    # plt_times = [[3, 5, 6], [4, 1, 3]]
+    # print get_time_string(), get_cumulative_plt_time(plt_times)
+
+# experiment_number = 70
+# tune_num_eigen_vectors(1, experiment_number)
+# experiment_number += 1
+# tune_num_eigen_vectors(2, experiment_number)
+# experiment_number += 1
+# tune_num_eigen_vectors(3, experiment_number)
+# experiment_number += 1
+# tune_num_eigen_vectors(5, experiment_number)
+# experiment_number += 1
+#
+# tune_training_set_size(100, experiment_number)
+# experiment_number += 1
+# tune_training_set_size(200, experiment_number)
+# experiment_number += 1
+# tune_training_set_size(300, experiment_number)
+# experiment_number += 1
+# tune_training_set_size(500, experiment_number)
+# experiment_number += 1
+
+# experiment_number = 78
+# tune_knn_size(100, experiment_number)
+# experiment_number += 1
+# tune_knn_size(200, experiment_number)
+# experiment_number += 1
+# tune_knn_size(300, experiment_number)
+# experiment_number += 1
+# tune_knn_size(500, experiment_number)
+# experiment_number += 1
+
+# parse_command_line_args(sys.argv)
+if sys.argv[1] == 'single':
+    adhoc(sys.argv)
+elif sys.argv[1] == 'batch':
+    parse_command_line_args(sys.argv)
+else:
+    print 'Valid arguments are \'single\' and \'batch\''
 # test_pyplot2()
