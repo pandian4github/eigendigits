@@ -34,7 +34,7 @@ def display_digit_images(digits_matrix, grid_size, image_name):
     return
 
 
-# Takes training set images as input and returns the eigen values and eigen vectors of the set in decreasing order
+# Takes training set images as input and returns the mean image, eigen vectors and normalized eigen vectors of the set in decreasing order of eigen values
 def hw1FindEigendigits(training_set_images):
     # Compute the mean of the columns in the chosen sample images
     training_set_images_mean = np.mean(training_set_images, axis=1)
@@ -103,7 +103,9 @@ def pause():
     return
 
 
-# Cosine based
+# Cosine based k-NN classification
+# Returns a matrix of T*K where T is the test set size and K is the number of neighbours used,
+# containing the indices of training set image which is near to test set image
 def k_nearest_neighbours_cosine(train_set_eigen_projected, test_set_eigen_projected, k):
     test_set_size = test_set_eigen_projected.shape[1]
     train_set_size = train_set_eigen_projected.shape[1]
@@ -125,7 +127,9 @@ def k_nearest_neighbours_cosine(train_set_eigen_projected, test_set_eigen_projec
     return N
 
 
-# Manhattan distance based
+# Manhattan distance based k-NN classification
+# Returns a matrix of T*K where T is the test set size and K is the number of neighbours used,
+# containing the indices of training set image which is near to test set image
 def k_nearest_neighbours_manhattan(train_set_eigen_projected, test_set_eigen_projected, k):
     test_set_size = test_set_eigen_projected.shape[1]
     train_set_size = train_set_eigen_projected.shape[1]
@@ -147,7 +151,9 @@ def k_nearest_neighbours_manhattan(train_set_eigen_projected, test_set_eigen_pro
     return N
 
 
-# Euclidean distance based
+# Euclidean distance based k-NN classification
+# Returns a matrix of T*K where T is the test set size and K is the number of neighbours used,
+# containing the indices of training set image which is near to test set image
 def k_nearest_neighbours_euclidean(train_set_eigen_projected, test_set_eigen_projected, k):
     test_set_size = test_set_eigen_projected.shape[1]
     train_set_size = train_set_eigen_projected.shape[1]
@@ -169,6 +175,7 @@ def k_nearest_neighbours_euclidean(train_set_eigen_projected, test_set_eigen_pro
     return N
 
 
+# Takes type of distance as argument and calls corresponding classification method
 def k_nearest_neighbours(train_set_eigen_projected, test_set_eigen_projected, k, type):
     types = ['Euclidean', 'Manhattan', 'Cosine']
     if type == 'Euclidean':
@@ -182,11 +189,13 @@ def k_nearest_neighbours(train_set_eigen_projected, test_set_eigen_projected, k,
     return -1
 
 
+# Given an array, returns the most frequent value appearing in the array
 def most_frequent_value(arr):
     counts = Counter(arr)
     return int(counts.most_common(1)[0][0])
 
 
+# Assign and return labels to test images given the N matrix from k-NN and the training set labels
 def assign_labels_to_test_set(N, train_set_labels):
     test_set_size = N.shape[0]
     test_set_labels = np.zeros(test_set_size)
@@ -199,6 +208,7 @@ def assign_labels_to_test_set(N, train_set_labels):
     return test_set_labels
 
 
+# Calculate the accuracy as a percentage of correct prediction for test set labels
 def get_accuracy(test_set_labels, actual_test_set_labels):
     test_set_size = test_set_labels.shape[0]
     match = 0
@@ -211,8 +221,10 @@ def get_accuracy(test_set_labels, actual_test_set_labels):
     return accuracy
 
 
+# The main method which does one unit of experiment and returns the accuracy for the given parameters
 def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size, arg_num_eigen_vectors, difficulty,
                           experiment_number, sub_experiment_number, trial_number, knn_type):
+    # Some sample images are stored in this directories
     dir_name = '../images_' + `experiment_number`
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
@@ -286,9 +298,9 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     # Select a test set
     test_set_size = arg_test_set_size
     print get_time_string(), '%d random images from the test set is chosen. ' % test_set_size
-    if difficulty == 0:  # easy
+    if difficulty == 0:  # difficult
         test_set_indices = np.random.randint(0, 5000, test_set_size)
-    else:  # difficult
+    else:  # easy
         test_set_indices = np.random.randint(5000, 10000, test_set_size)
     test_set_images = test_all_images[:, test_set_indices]
     test_set_labels = test_all_lables[:, test_set_indices]
@@ -325,6 +337,7 @@ def eigen_digits_classify(arg_training_set_size, arg_test_set_size, arg_knn_size
     return accuracy
 
 
+# Returns an optimal value to use for graph plots for min accuracy
 def get_min_axis_for_accuracy(min_accuracy):
     min_accuracy = int(min_accuracy)
     min_accuracy -= 10
@@ -349,6 +362,7 @@ def print_usage_batch():
     return
 
 
+# Combine time taken by easy and hard test cases and return the cumulative time taken
 def get_cumulative_plt_time(plt_times):
     cum_plt_times = []
     for i in range(len(plt_times[0])):
@@ -356,12 +370,14 @@ def get_cumulative_plt_time(plt_times):
     return cum_plt_times
 
 
+# Returns formatted current time as string
 def get_time_string():
     return time.strftime('%c') + ' '
 
 
-def parse_command_line_args(sys_arg):
-    print get_time_string(), 'Number of arguments: %d' % len(sys_arg)
+# Parse the command line arguments for a batch experiment and call the driver with appropriate parameters
+def parse_command_line_args_batch(sys_arg):
+    # print get_time_string(), 'Number of arguments: %d' % len(sys_arg)
     experiment_number = -1
     number_of_trials = 0
     test = 1
@@ -399,7 +415,9 @@ def parse_command_line_args_adhoc(sys_arg):
     return sys_arg[2], sys_arg[3], sys_arg[4], sys_arg[5], sys_arg[6], sys_arg[7], sys_arg[8]
 
 
-def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size,
+# Plot the effect of number of eigen vectors on accuracy, the value where accuracy goes to peak is returned and is used
+# for further experiments
+def plot_eigen_value_vs_accuracy(experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size,
                                  eigen_vector_sizes, total_trials, difficulty_string, plot_dir_name,
                                  eigen_vector_sizes_plt_extra_ul, knn_type):
     print_divider_with_text('Sub-experiment ' + `sub_experiment_number`)
@@ -469,6 +487,8 @@ def plot_eigen_value_vs_accurace(experiment_number, sub_experiment_number, knn_s
     return max_num_eigen_vectors, max_accuracies, plt_accuracies, plt_time_taken
 
 
+# Plot the effect of training set size on accuracy, the value for which accuracy is maximum is returned and is used
+# in further experiments
 def plot_training_set_size_vs_accuracy(experiment_number, sub_experiment_number, knn_size, test_set_size,
                                        max_num_eigen_vectors, training_set_sizes, total_trials, difficulty_string,
                                        plot_dir_name, training_set_sizes_plt_extra_ul, knn_type):
@@ -540,6 +560,7 @@ def plot_training_set_size_vs_accuracy(experiment_number, sub_experiment_number,
     return max_training_set_size, max_accuracies, plt_accuracies, plt_time_taken
 
 
+# Plot the effect of knn size on accuracy
 def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set_size, max_num_eigen_vectors,
                               max_training_set_size, knn_sizes, total_trials, difficulty_string, plot_dir_name,
                               knn_sizes_plt_extra_ul, knn_type):
@@ -611,9 +632,11 @@ def plot_knn_size_vs_accuracy(experiment_number, sub_experiment_number, test_set
     return max_knn_size, max_accuracies, plt_accuracies, plt_time_taken
 
 
+# The driver function which calls different sub-experiments and plots the accuracy graphs
 def driver(arg_experiment_number, arg_total_trials, arg_test):
     experiment_number = arg_experiment_number
 
+    # The plots are stored in this directory
     plot_dir_name = '../plots_' + `experiment_number`
     if not os.path.exists(plot_dir_name):
         os.makedirs(plot_dir_name)
@@ -653,7 +676,8 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         training_set_size = 100
         test_set_size = 50
 
-    euclidean_max_num_eigen_vectors, euclidean_max_accuracies_eigen, euclidean_plt_accuracies_eigen, euclidean_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
+    # Set of experiments for Euclidean type
+    euclidean_max_num_eigen_vectors, euclidean_max_accuracies_eigen, euclidean_plt_accuracies_eigen, euclidean_plt_time_taken_eigen = plot_eigen_value_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Euclidean')
     sub_experiment_number += 1
@@ -668,8 +692,8 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         knn_sizes_plt_extra_ul, 'Euclidean')
     sub_experiment_number += 1
 
-
-    cosine_max_num_eigen_vectors, cosine_max_accuracies_eigen, cosine_plt_accuracies_eigen, cosine_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
+    # Set of experiments for Cosine type
+    cosine_max_num_eigen_vectors, cosine_max_accuracies_eigen, cosine_plt_accuracies_eigen, cosine_plt_time_taken_eigen = plot_eigen_value_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Cosine')
     sub_experiment_number += 1
@@ -683,7 +707,8 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
         'Cosine')
     sub_experiment_number += 1
 
-    manhattan_max_num_eigen_vectors, manhattan_max_accuracies_eigen, manhattan_plt_accuracies_eigen, manhattan_plt_time_taken_eigen = plot_eigen_value_vs_accurace(
+    # Set of experiments for Manhattan type
+    manhattan_max_num_eigen_vectors, manhattan_max_accuracies_eigen, manhattan_plt_accuracies_eigen, manhattan_plt_time_taken_eigen = plot_eigen_value_vs_accuracy(
         experiment_number, sub_experiment_number, knn_size, training_set_size, test_set_size, eigen_vector_sizes,
         total_trials, difficulty_string, plot_dir_name, eigen_vector_sizes_plt_extra_ul, 'Manhattan')
     sub_experiment_number += 1
@@ -738,26 +763,14 @@ def driver(arg_experiment_number, arg_total_trials, arg_test):
                                [0, knn_sizes[-1] + knn_sizes_plt_extra_ul, accuracy_min_scale, 100],
                                file_name)
 
-    # for i in range(0, len(training_set_sizes)):
-    #     for j in range(0, len(test_set_sizes)):
-    #         for l in range(0, len(eigen_vector_sizes)):
-    #             for k in range(0, len(knn_sizes)):
-    #                 for difficulty in [0, 1]: # 0 for easy and 1 for difficult test set
-    #                     accuracy = 0.0
-    #                     for trial in range (1, 10): # do ten trials and take average accuracy
-    #                         # print get_time_string(), 'Calling eigen digits classification for parameters: training_set_size: %d test_set_size: %d knn_size: %d num_eigen_vectors: %d ' % (training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l])
-    #                         # eigen_digits_classify(training_set_sizes[i], test_set_sizes[j], knn_sizes[k], eigen_vector_sizes[l], difficulty, experiment_number, trial)
-    # print get_time_string(), 'Accuracy: %d' % eigen_digits_classify(10000, 500, 5, 500, 1, 1, 1)
-
     return
 
 
+# Tune number of eigen vectors by plotting training set size vs accuracy
 def tune_num_eigen_vectors(knn_size, experiment_number):
     training_set_sizes = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000]
     training_set_sizes_plt_extra_ul = 1000
     eigen_vector_sizes = [10, 50, 100, 250, 500]
-    # knn_size = 5
-    # experiment_number = 51
     difficulty_string = ['hard', 'easy']
     total_trials = 1
     plot_dir_name = '../plots_' + `experiment_number`
@@ -778,6 +791,7 @@ def plot_tune_num_eigen_vectors(experiment_number, sub_experiment_number, test_s
     num_training_set_sizes = len(training_set_sizes)
     plt_accuracies = [[[0.0 for k in xrange(num_training_set_sizes)] for j in xrange(num_plots)] for i in xrange(2)]
 
+    # To use for different value of num_eigen_vectors in the plot
     colors = ['blue', 'green', 'red', 'magenta', 'cyan']
     linestyles = ['b-o', 'g-o', 'r-o', 'm-o', 'c-o']
 
@@ -825,6 +839,7 @@ def plot_tune_num_eigen_vectors(experiment_number, sub_experiment_number, test_s
     return
 
 
+# Tune training set size by plotting knn size vs accuracy
 def tune_training_set_size(num_eigen_vectors, experiment_number):
     training_set_sizes = [100, 250, 500, 1000, 5000]
     knn_sizes_plt_extra_ul = 5
@@ -898,6 +913,7 @@ def plot_tune_training_set_size(experiment_number, sub_experiment_number, test_s
     return
 
 
+# Tune knn size by plotting training set size vs accuracy
 def tune_knn_size(num_eigen_vectors, experiment_number):
     training_set_sizes = [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000]
     training_set_sizes_plt_extra_ul = 1000
@@ -971,6 +987,7 @@ def plot_tune_knn_sizes(experiment_number, sub_experiment_number, test_set_size,
     return
 
 
+# To plot the tune graphs using matplotlib
 def plot_tune_graph(x_axis, y_axis, linestyles, legends, colors, x_label, y_label, title, axis, file_name, bba_x, bba_y):
     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
 
@@ -989,8 +1006,6 @@ def plot_tune_graph(x_axis, y_axis, linestyles, legends, colors, x_label, y_labe
         plt.plot(x_axis, y_axis[i], linestyles[i], label=legends[i])
         patches.extend([mpatches.Patch(color=colors[i], label=legends[i], linestyle='solid', linewidth=0.1)])
 
-    # plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc=2)
-
     lgd = plt.legend(handles=patches, loc='upper right', bbox_to_anchor=(bba_x, bba_y))
 
     plt.grid(True)
@@ -1002,11 +1017,10 @@ def plot_tune_graph(x_axis, y_axis, linestyles, legends, colors, x_label, y_labe
     fig = plt.figure(1)
     fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 
-    # plt.show()
-    # plt.savefig(file_name)
     plt.close()
 
 
+# To plot the graph comparing between distance types
 def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, title, axis, file_name):
     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
 
@@ -1026,8 +1040,6 @@ def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, 
     blue_cosine_patch = mpatches.Patch(color='blue', label='Cosine', linestyle='solid', linewidth=0.1)
     green_manhattan_patch = mpatches.Patch(color='green', label='Manhattan', linestyle='solid', linewidth=0.1)
 
-    # plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc=2)
-
     lgd = plt.legend(handles=[red_euclidean_patch, blue_cosine_patch, green_manhattan_patch], loc='upper right', bbox_to_anchor=(1.4, 1.0))
 
     plt.grid(True)
@@ -1039,8 +1051,6 @@ def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, 
     fig = plt.figure(1)
     fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 
-    # plt.show()
-    # plt.savefig(file_name)
     plt.close()
 
 
@@ -1063,6 +1073,7 @@ def plot_graph_compare_knn(x_axis, y_axis1, y_axis2, y_axis3, x_label, y_label, 
 #     plt.close()
 
 
+# To plot accuracy graphs along with time axis
 def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, title, axis, file_name):
     print get_time_string(), 'Plotting %s to file %s' % (title, file_name)
 
@@ -1088,8 +1099,6 @@ def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, ti
     ax1.set_xlim(left=axis[0], right=axis[1])
     ax1.set_ylim(bottom=axis[2], top=axis[3])
     ax2.set_ylim(bottom=axis[4], top=axis[5])
-    # ax1.set_xticks(x_ticks)
-    # ax1.set_yticks([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100])
 
     red_hard_patch = mpatches.Patch(color='red', label='Hard', linestyle='solid', linewidth=0.1)
     blue_easy_patch = mpatches.Patch(color='blue', label='Easy', linestyle='solid', linewidth=0.1)
@@ -1103,31 +1112,31 @@ def plot_graph_with_time(x_axis, y_axis, y2_axis, x_label, y_label, y2_label, ti
     fig = plt.figure(1)
     fig.savefig(file_name, dpi=300, format='png', bbox_extra_artists=(lgd,), bbox_inches='tight')
 
-    # plt.savefig(file_name)
-    # fig.savefig('image_output.png', dpi = 400, format = 'png', bbox_extra_artists = (lgd,), bbox_inches = 'tight')
     plt.close()
 
 
-def test_pyplot2():
-    plot_graph_compare_knn([50, 100, 500, 1000, 5000, 10000, 25000, 50000, 60000], [23.5, 34.5, 45.5, 67, 76, 79, 84, 87, 92],  [22, 33, 44, 63, 71, 75, 80, 84, 89], [18, 30, 41, 60, 69, 72, 28, 81, 86], 'Training set size', 'Accuracy (%)', 'Training set size vs Accuracy', [0, 70000, 0, 100], 'sample2.png')
-
-
-def test_pyplot():
-    accuracies = [[56, 65, 76, 84, 98.5, 78.5, 89.2, 98.3], [43, 54, 64, 76, 93.2, 45.6, 74.5, 82.3]]
-    time_taken = [10, 20, 25, 28, 30, 50, 70, 90]
-    training_set_sizes = [10, 50, 100, 500, 1000, 15000, 30000, 50000]
-    xticks = []
-    i = 0
-    while i <= 60000:
-        xticks.extend([i])
-        i += 5000
-
-    xlabel = 'Training set size'
-    ylabel = 'Accuracy (%)'
-    y2label = 'Time taken (sec)'
-    title = 'Effect of training set size on accuracy'
-    axis = [0, 60000, 30, 100, 0, 100]
-    plot_graph_with_time(training_set_sizes, xticks, accuracies, time_taken, xlabel, ylabel, y2label, title, axis, 'sample.png')
+# Test function, ignore
+# def test_pyplot2():
+#     plot_graph_compare_knn([50, 100, 500, 1000, 5000, 10000, 25000, 50000, 60000], [23.5, 34.5, 45.5, 67, 76, 79, 84, 87, 92],  [22, 33, 44, 63, 71, 75, 80, 84, 89], [18, 30, 41, 60, 69, 72, 28, 81, 86], 'Training set size', 'Accuracy (%)', 'Training set size vs Accuracy', [0, 70000, 0, 100], 'sample2.png')
+#
+#
+# # Test function, ignore
+# def test_pyplot():
+#     accuracies = [[56, 65, 76, 84, 98.5, 78.5, 89.2, 98.3], [43, 54, 64, 76, 93.2, 45.6, 74.5, 82.3]]
+#     time_taken = [10, 20, 25, 28, 30, 50, 70, 90]
+#     training_set_sizes = [10, 50, 100, 500, 1000, 15000, 30000, 50000]
+#     xticks = []
+#     i = 0
+#     while i <= 60000:
+#         xticks.extend([i])
+#         i += 5000
+#
+#     xlabel = 'Training set size'
+#     ylabel = 'Accuracy (%)'
+#     y2label = 'Time taken (sec)'
+#     title = 'Effect of training set size on accuracy'
+#     axis = [0, 60000, 30, 100, 0, 100]
+#     plot_graph_with_time(training_set_sizes, xticks, accuracies, time_taken, xlabel, ylabel, y2label, title, axis, 'sample.png')
 
 
 def print_usage_adhoc():
@@ -1141,8 +1150,7 @@ def adhoc(sys_arg):
         return
     accuracy = eigen_digits_classify(int(training_set_size), int(test_set_size), int(knn_size), int(num_eigen_vectors), int(difficulty), int(experiment_number), 1, 1, 'Euclidean')
     print 'Accuracy obtained: ', accuracy
-    # plt_times = [[3, 5, 6], [4, 1, 3]]
-    # print get_time_string(), get_cumulative_plt_time(plt_times)
+
 
 # experiment_number = 70
 # tune_num_eigen_vectors(1, experiment_number)
@@ -1173,11 +1181,10 @@ def adhoc(sys_arg):
 # tune_knn_size(500, experiment_number)
 # experiment_number += 1
 
-# parse_command_line_args(sys.argv)
+# Entry point where the program starts
 if sys.argv[1] == 'single':
     adhoc(sys.argv)
 elif sys.argv[1] == 'batch':
-    parse_command_line_args(sys.argv)
+    parse_command_line_args_batch(sys.argv)
 else:
     print 'Valid arguments are \'single\' and \'batch\''
-# test_pyplot2()
