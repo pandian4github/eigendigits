@@ -21,3 +21,5 @@ Usage:	python -u main.py batch [<experiment_number>] [<number_of_trials_for_each
 		If 'test' is specified, very smaller values are chosen for paramters (just to see if end-to-end program works, no analysis can be done from this)
 
 Apart from this, the code is sufficiently commented and method names and variable names are self-explanatory. 
+
+P.S: Python 2.7 is used for the development and the following packages might be required for the program to run - python, python-scipy, python-numpy, python-pil, python-matplotlib
